@@ -340,28 +340,45 @@ for i in range(8,12): #Mostly (~80%) sorted, rest random (except nums, they repe
 
 
 SortTypes= [GnomeSort,BubbleSort,InsertionSort,SelectionSort,CocktailSort,QuickSort,MergeSort,HeapSort,RadixSort,TimSort]
-SortedArrays=[0]*sortsAmount
-SortingTimes=[[0]*48]*sortsAmount
-SortingIters=[[0]*48]*sortsAmount
-AverageIters=[[0]*48]*sortsAmount
-print (SortingIters)
+SortingTimes=np.zeros((sortsAmount,48),dtype=float)
+SortingIters=np.zeros((sortsAmount,48),dtype=float)
+AverageIters=np.zeros((sortsAmount,48),dtype=float)
 
-for i in range(sortsAmount):
-    if i>=0 and i<5:
-        for j in range(12):
-            AverageIters[i][j]=len(intArrays[j])^2
-            AverageIters[i][j+4]=AverageIters[i][j]
-            AverageIters[i][j+8]=AverageIters[i][j]
-            AverageIters[i][j+12]=AverageIters[i][j]
-    elif i>=5 and i!=8:
-        for j in range(12):
-            AverageIters[i][j]= int(len(intArrays[j])*math.log(len(intArrays[j])))
-            AverageIters[i][j + 4] = AverageIters[i][j]
-            AverageIters[i][j + 8] = AverageIters[i][j]
-            AverageIters[i][j + 12] = AverageIters[i][j]
-
+for i in range(10):
+    if i<5:
+        for j in range(48):
+            AverageIters[i][j] = len(intArrays[j%12])*len(intArrays[j%12])
+    if i >= 5 and i != 8:
+        for j in range(48):
+            AverageIters[i][j] = len(intArrays[j%12])*math.log(len(intArrays[j%12]))
 print (AverageIters)
 
-#for i in range (sortsAmount):
-#    for j in range(len(intArrays[0])):
-#        SortingIters[i][]
+dfAverage=pd.DataFrame(AverageIters)
+
+print (dfAverage)
+
+for i in range(sortsAmount):
+    for j in range(12):
+        start= timer()
+        SortingIters[i][j]=SortTypes[i](numArrays[j%12].copy())
+        SortingTimes[i][j]=timer()-start
+    for j in range(12,24):
+        start= timer()
+        SortingIters[i][j]=SortTypes[i](intArrays[j%12].copy())
+        SortingTimes[i][j]=timer()-start
+    if i !=8:
+        for j in range(24,36):
+            start= timer()
+            SortingIters[i][j]=SortTypes[i](strArrays[j%12].copy())
+            SortingTimes[i][j]=timer()-start
+        for j in range(36,48):
+            start= timer()
+            SortingIters[i][j]=SortTypes[i](dateArrays[j%12].copy())
+            SortingTimes[i][j]=timer()-start
+
+dfTimes=pd.DataFrame(SortingTimes)
+dfIters=pd.DataFrame(SortingIters)
+
+dfAverage.to_excel(r'C:\Users\grigo\Documents\Averages.xlsx')
+dfIters.to_excel(r'C:\Users\grigo\Documents\Iters.xlsx')
+dfTimes.to_excel(r'C:\Users\grigo\Documents\Time.xlsx')
