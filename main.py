@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 
 from timeit import default_timer as timer
@@ -341,28 +343,25 @@ SortTypes= [GnomeSort,BubbleSort,InsertionSort,SelectionSort,CocktailSort,QuickS
 SortedArrays=[0]*sortsAmount
 SortingTimes=[[0]*48]*sortsAmount
 SortingIters=[[0]*48]*sortsAmount
+AverageIters=[[0]*48]*sortsAmount
+print (SortingIters)
 
-testA1=dateArrays[0].copy()
-testA2=testA1.copy()
-testA3=[0]*500000
-for i in range (len(testA3)):
-    testA3[i]=rng.randint(0,1000)
-print (testA2)
-start1=timer()
-print(QuickSort(testA2,0,len(testA2)-1))
-print(timer()-start1)
-print(testA2)
+for i in range(sortsAmount):
+    if i>=0 and i<5:
+        for j in range(12):
+            AverageIters[i][j]=len(intArrays[j])^2
+            AverageIters[i][j+4]=AverageIters[i][j]
+            AverageIters[i][j+8]=AverageIters[i][j]
+            AverageIters[i][j+12]=AverageIters[i][j]
+    elif i>=5 and i!=8:
+        for j in range(12):
+            AverageIters[i][j]= int(len(intArrays[j])*math.log(len(intArrays[j])))
+            AverageIters[i][j + 4] = AverageIters[i][j]
+            AverageIters[i][j + 8] = AverageIters[i][j]
+            AverageIters[i][j + 12] = AverageIters[i][j]
 
-
-
-#for i in range(sortsAmount):
-
+print (AverageIters)
 
 #for i in range (sortsAmount):
-#   if i!=5 and i!=6:
-#        SortedArrays[i]=a.copy()
-#        SortTypes[i](SortedArrays[i])
-#   else:
-#       SortedArrays[i] = a.copy()
-#       print(SortedArrays[i])
-#       SortTypes[i](SortedArrays[i],0,len(a)-1)
+#    for j in range(len(intArrays[0])):
+#        SortingIters[i][]
