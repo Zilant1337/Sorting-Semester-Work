@@ -10,7 +10,7 @@ import string
 from numba import jit,cuda
 import numpy as np
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(600000)
 
 MIN_MERGE = 32
 sortsAmount=10
@@ -356,6 +356,7 @@ for i in range(10):
 
 
 dfAverage=pd.DataFrame(AverageIters)
+
 
 for i in range(sortsAmount):
     if i!=5 and i!=6:
