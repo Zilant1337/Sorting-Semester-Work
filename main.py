@@ -351,31 +351,53 @@ for i in range(10):
     if i >= 5 and i != 8:
         for j in range(48):
             AverageIters[i][j] = len(intArrays[j%12])*math.log(len(intArrays[j%12]))
-print (AverageIters)
+
 
 dfAverage=pd.DataFrame(AverageIters)
 
-print (dfAverage)
+print(dateArrays[0])
+print(TimSort(dateArrays[0]))
+print(dateArrays[0])
+
+
 
 for i in range(sortsAmount):
-    for j in range(12):
-        start= timer()
-        SortingIters[i][j]=SortTypes[i](numArrays[j%12].copy())
-        SortingTimes[i][j]=timer()-start
-    for j in range(12,24):
-        start= timer()
-        SortingIters[i][j]=SortTypes[i](intArrays[j%12].copy())
-        SortingTimes[i][j]=timer()-start
-    if i !=8:
-        for j in range(24,36):
+    if i!=5 and i!=6:
+        for j in range(12):
             start= timer()
-            SortingIters[i][j]=SortTypes[i](strArrays[j%12].copy())
+            SortingIters[i][j]=SortTypes[i](numArrays[j%12].copy())
             SortingTimes[i][j]=timer()-start
-        for j in range(36,48):
+        for j in range(12,24):
             start= timer()
-            SortingIters[i][j]=SortTypes[i](dateArrays[j%12].copy())
+            SortingIters[i][j]=SortTypes[i](intArrays[j%12].copy())
             SortingTimes[i][j]=timer()-start
-
+        if i !=8:
+            for j in range(24,36):
+                start= timer()
+                SortingIters[i][j]=SortTypes[i](strArrays[j%12].copy())
+                SortingTimes[i][j]=timer()-start
+            for j in range(36,48):
+                start= timer()
+                SortingIters[i][j]=SortTypes[i](dateArrays[j%12].copy())
+                SortingTimes[i][j]=timer()-start
+    else:
+        for j in range(12):
+            start= timer()
+            SortingIters[i][j]=SortTypes[i](numArrays[j%12].copy(),0,len(numArrays[j%12])-1)
+            SortingTimes[i][j]=timer()-start
+        for j in range(12,24):
+            start= timer()
+            SortingIters[i][j]=SortTypes[i](intArrays[j%12].copy(),0,len(intArrays[j%12])-1)
+            SortingTimes[i][j]=timer()-start
+        if i !=8:
+            for j in range(24,36):
+                start= timer()
+                SortingIters[i][j]=SortTypes[i](strArrays[j%12].copy(),0,len(strArrays[j%12])-1)
+                SortingTimes[i][j]=timer()-start
+            for j in range(36,48):
+                start= timer()
+                SortingIters[i][j]=SortTypes[i](dateArrays[j%12].copy(),0,len(dateArrays[j%12])-1)
+                SortingTimes[i][j]=timer()-start
 dfTimes=pd.DataFrame(SortingTimes)
 dfIters=pd.DataFrame(SortingIters)
 
