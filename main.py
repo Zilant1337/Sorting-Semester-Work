@@ -1,7 +1,7 @@
 import math
 import sys
 import matplotlib.pyplot as plt
-
+import threading
 from timeit import default_timer as timer
 import random as rng
 import datetime as dt
@@ -10,10 +10,63 @@ import string
 from numba import jit,cuda
 import numpy as np
 
-sys.setrecursionlimit(600000)
+sys.setrecursionlimit(1000000)
+threading.stack_size(2**26)
 
 MIN_MERGE = 32
 sortsAmount=10
+
+def main(numArrays,intArrays,strArrays,dateArrays, SortingTimes,SortingIters):
+    for i in range(sortsAmount):
+        if i != 5 and i != 6:
+            for j in range(12):
+                start = timer()
+                SortingIters[i][j] = SortTypes[i](numArrays[j % 12].copy())
+                SortingTimes[i][j] = timer() - start
+                print('Done!')
+            for j in range(12, 24):
+                start = timer()
+                SortingIters[i][j] = SortTypes[i](intArrays[j % 12].copy())
+                SortingTimes[i][j] = timer() - start
+                print('Done!')
+            if i != 8:
+                for j in range(24, 36):
+                    start = timer()
+                    SortingIters[i][j] = SortTypes[i](strArrays[j % 12].copy())
+                    SortingTimes[i][j] = timer() - start
+                    print('Done!')
+                for j in range(36, 48):
+                    start = timer()
+                    SortingIters[i][j] = SortTypes[i](dateArrays[j % 12].copy())
+                    SortingTimes[i][j] = timer() - start
+                    print('Done!')
+        else:
+            for j in range(12):
+                start = timer()
+                SortingIters[i][j] = SortTypes[i](numArrays[j % 12].copy(), 0, len(numArrays[j % 12]) - 1)
+                SortingTimes[i][j] = timer() - start
+                print('Done!')
+            for j in range(12, 24):
+                start = timer()
+                SortingIters[i][j] = SortTypes[i](intArrays[j % 12].copy(), 0, len(intArrays[j % 12]) - 1)
+                SortingTimes[i][j] = timer() - start
+                print('Done!')
+            if i != 8:
+                for j in range(24, 36):
+                    start = timer()
+                    SortingIters[i][j] = SortTypes[i](strArrays[j % 12].copy(), 0, len(strArrays[j % 12]) - 1)
+                    SortingTimes[i][j] = timer() - start
+                    print('Done!')
+                for j in range(36, 48):
+                    start = timer()
+                    SortingIters[i][j] = SortTypes[i](dateArrays[j % 12].copy(), 0, len(dateArrays[j % 12]) - 1)
+                    SortingTimes[i][j] = timer() - start
+                    print('Done!')
+    dfTimes = pd.DataFrame(SortingTimes)
+    dfIters = pd.DataFrame(SortingIters)
+
+    dfIters.to_excel(r'C:\Users\grigo\Documents\ItersRecursive.xlsx')
+    dfTimes.to_excel(r'C:\Users\grigo\Documents\TimeRecursive.xlsx')
 
 
 @jit(target_backend='cuda')
@@ -344,69 +397,11 @@ for i in range(8,12): #Mostly (~80%) sorted, rest random (except nums, they repe
 SortTypes= [GnomeSort,BubbleSort,InsertionSort,SelectionSort,CocktailSort,QuickSort,MergeSort,HeapSort,RadixSort,TimSort]
 SortingTimes=np.zeros((sortsAmount,48),dtype=float)
 SortingIters=np.zeros((sortsAmount,48),dtype=float)
-AverageIters=np.zeros((sortsAmount,48),dtype=float)
 
-for i in range(10):
-    if i<5:
-        for j in range(48):
-            AverageIters[i][j] = len(intArrays[j%12])*len(intArrays[j%12])
-    if i >= 5 and i != 8:
-        for j in range(48):
-            AverageIters[i][j] = len(intArrays[j%12])*math.log(len(intArrays[j%12]))
-
-
-dfAverage=pd.DataFrame(AverageIters)
-
-
-for i in range(sortsAmount):
-    if i!=5 and i!=6:
-        for j in range(12):
-            start= timer()
-            SortingIters[i][j]=SortTypes[i](numArrays[j%12].copy())
-            SortingTimes[i][j]=timer()-start
-            print('Done!')
-        for j in range(12,24):
-            start= timer()
-            SortingIters[i][j]=SortTypes[i](intArrays[j%12].copy())
-            SortingTimes[i][j]=timer()-start
-            print('Done!')
-        if i !=8:
-            for j in range(24,36):
-                start= timer()
-                SortingIters[i][j]=SortTypes[i](strArrays[j%12].copy())
-                SortingTimes[i][j]=timer()-start
-                print('Done!')
-            for j in range(36,48):
-                start= timer()
-                SortingIters[i][j]=SortTypes[i](dateArrays[j%12].copy())
-                SortingTimes[i][j]=timer()-start
-                print('Done!')
-    else:
-        for j in range(12):
-            start= timer()
-            SortingIters[i][j]=SortTypes[i](numArrays[j%12].copy(),0,len(numArrays[j%12])-1)
-            SortingTimes[i][j]=timer()-start
-            print('Done!')
-        for j in range(12,24):
-            start= timer()
-            SortingIters[i][j]=SortTypes[i](intArrays[j%12].copy(),0,len(intArrays[j%12])-1)
-            SortingTimes[i][j]=timer()-start
-            print('Done!')
-        if i !=8:
-            for j in range(24,36):
-                start= timer()
-                SortingIters[i][j]=SortTypes[i](strArrays[j%12].copy(),0,len(strArrays[j%12])-1)
-                SortingTimes[i][j]=timer()-start
-                print('Done!')
-            for j in range(36,48):
-                start= timer()
-                SortingIters[i][j]=SortTypes[i](dateArrays[j%12].copy(),0,len(dateArrays[j%12])-1)
-                SortingTimes[i][j]=timer()-start
-                print('Done!')
+threading.Thread(target=main, args=(numArrays,intArrays,strArrays,dateArrays,SortingTimes,SortingIters)).start()
 
 dfTimes=pd.DataFrame(SortingTimes)
 dfIters=pd.DataFrame(SortingIters)
 
-dfAverage.to_excel(r'C:\Users\grigo\Documents\Averages.xlsx')
-dfIters.to_excel(r'C:\Users\grigo\Documents\Iters.xlsx')
-dfTimes.to_excel(r'C:\Users\grigo\Documents\Time.xlsx')
+dfIters.to_excel(r'C:\Users\grigo\Documents\ItersRecursive.xlsx')
+dfTimes.to_excel(r'C:\Users\grigo\Documents\TimeRecursive.xlsx')
